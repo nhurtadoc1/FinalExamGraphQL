@@ -4,11 +4,16 @@ import { Query } from "./resolvers/Query.ts";
 import { Mutation } from "./resolvers/Mutation.ts";
 import { typeDefs } from "./gql/schema.ts";
 import montoose from "mongoose";
+import { load } from "https://deno.land/std@0.204.0/dotenv/mod.ts";
 
 try {
-  const MONGO_URL = Deno.env.get("MONGO_URL");
+  const env = await load();
+  
+  const MONGO_URL = env.MONGO_URL || Deno.env.get("MONGO_URL");
+  
   if (!MONGO_URL) {
-    throw new Error("Please provide a MongoDB connection string");
+    console.log("No mongo URL found");
+    Deno.exit(1);
   }
 
   // Connect to MongoDB
@@ -26,6 +31,6 @@ try {
 
   const { url } = await startStandaloneServer(server);
   console.info(`🚀 Server ready at ${url}`);
-} catch {
-  console.log("Error");
+} catch (error) {
+  console.log(error);
 }
